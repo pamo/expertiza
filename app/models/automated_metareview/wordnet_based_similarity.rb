@@ -35,7 +35,7 @@ class WordnetBasedSimilarity
     #stokSub = submission.split(" ") #should've been inside when doing n * n comparison
     
     #iterating through review tokens
-    # for i in (0..stokRev.length-1)
+    for i in (0..stokRev.length-1)
       #if either of the tokens is null
       if(stokRev[i].nil?)
         next #continue with the next token
@@ -77,7 +77,7 @@ class WordnetBasedSimilarity
         
       stokSub = submission.split(" ")
       #iterating through submission tokens
-      # for j in (0..stokSub.length-1)
+      for j in (0..stokSub.length-1)
       
         if(stokSub[i].nil?)
           next
@@ -176,8 +176,8 @@ class WordnetBasedSimilarity
         # puts "No Match found!"
         @match = @match + NOMATCH
         @count+=1
-      # end #end of the for loop for submission tokens 
-    # end #end of the for loop for review tokens
+      end #end of the for loop for submission tokens 
+    end #end of the for loop for review tokens
     
     if(@count > 0)
       puts ("Match: #{@match} Count:: #{@count}")
