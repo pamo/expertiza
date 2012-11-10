@@ -87,7 +87,7 @@ end
     rev_array = Array.new #holds the non-plagiairised responses
     #comparing questions with text
     for i in 0..scores.length - 1
-      if(questions[i].downcase == review_text_arr[i].downcase)
+      if(!questions[i].nil? and !review_text_arr[i].nil? and questions[i].downcase == review_text_arr[i].downcase)
         count_copies+=1
         next #skip comparing with other responses
       end
@@ -95,7 +95,7 @@ end
       #comparing response with other responses
       flag = 0
       for j in 0..review_text_arr.length - 1
-        if(i != j and review_text_arr[i].downcase == review_text_arr[j].downcase)
+        if(i != j and !review_text_arr[i].nil? and !review_text_arr[j].nil? and review_text_arr[i].downcase == review_text_arr[j].downcase)
           count_copies+=1
           flag = 1
           break
@@ -127,13 +127,15 @@ end
     temp_array = Array.new
     review_text_arr.each{
       |rev_text|
-      #placing the search text within quotes to search exact match for the complete text
-      response = RubyWebSearch::Google.search(:query => "\""+ rev_text +"\"") 
-      #if the results are greater than 0, then the text has been copied
-      if(response.results.length > 0)
-        count+=1
-      else
-        temp_array << rev_text #copying the non-plagiarised text for evaluation
+      if(!rev_text.nil?)
+        #placing the search text within quotes to search exact match for the complete text
+        response = RubyWebSearch::Google.search(:query => "\""+ rev_text +"\"") 
+        #if the results are greater than 0, then the text has been copied
+        if(response.results.length > 0)
+          count+=1
+        else
+          temp_array << rev_text #copying the non-plagiarised text for evaluation
+        end
       end
     }
     #setting temp_array as the @review_array
