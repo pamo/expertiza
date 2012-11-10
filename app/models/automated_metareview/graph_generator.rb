@@ -566,13 +566,15 @@ def find_parents(t)
     end
     if(tp.contains_punct(unTaggedString[j]))
       unTaggedString[j] = tp.contains_punct(unTaggedString[j])
-      #puts "unTaggedString #{unTaggedString[j]}"
+      # puts "unTaggedString #{unTaggedString[j]} and #{tp.contains_punct_bool(unTaggedString[j])}"
     end
-    pat = parsed_sentence.getAllNodesByWordPattern(unTaggedString[j])
-    pat = pat.toArray
-    parent = parsed_sentence.getParents(pat[0]).toArray
+    if(!unTaggedString[j].nil? and !tp.contains_punct_bool(unTaggedString[j]))
+      pat = parsed_sentence.getAllNodesByWordPattern(unTaggedString[j])
+      pat = pat.toArray
+      parent = parsed_sentence.getParents(pat[0]).toArray
+    end
     #puts "parent of #{unTaggedString[j]} is #{parent[0]}"
-    if(!parent[0].nil?)
+    if(!parent.nil? and !parent[0].nil?)
       parents[j] =  (parent[0].to_s)[0..(parent[0].to_s).index("-")-1]#extracting the name of the parent (since it is in the foramt-> "name-POS")
       #puts "parents[#{j}] = #{parents[j]}"
     else
