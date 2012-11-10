@@ -36,10 +36,20 @@ class TextPreprocessing
     puts "***url #{url} #{url.class}"
     page = Nokogiri::HTML(open(url))
     #fetching the paragraph texts from the specified url
-    page.css('p').each do |subm|
-      # puts "subm.text.. #{subm.text}"
-      subm_array << subm.text 
-    end   
+    if(page.css('p').count != 0)
+      page.css('p').each do |subm|
+        # puts "subm.text.. #{subm.text}"
+        subm_array << subm.text 
+      end 
+    end
+    #for google docs where the text is placed inside <script></script> tags
+    if(page.css('script').count != 0)
+      page.css('script').each do |subm|
+        if(!subm.children[0].to_s.index("\"s\":\"").nil? and !subm.children[0].to_s.index("\\n\"},").nil?) #the string indicates the beginning of the text in the script
+          subm_array << subm.children[0].to_s[subm.children[0].to_s.index("\"s\":\"")+5, subm.children[0].to_s.index("\\n\"},")]
+        end
+      end
+    end
     return subm_array  
   end
 #------------------------------------------#------------------------------------------#------------------------------------------  
@@ -295,6 +305,15 @@ def contains_punct(str)
   end 
   return str
 end 
+
+def contains_punct_bool(str)
+  if(str.include?("\\n") or str.include?("}") or str.include?("{"))
+    return true
+  else
+    return false
+  end 
+end
+
 #------------------------------------------#------------------------------------------#------------------------------------------
 =begin
  Checking if "str" is a punctuation mark like ".", ",", "?" etc. 
