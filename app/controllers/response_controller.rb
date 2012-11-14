@@ -369,20 +369,26 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @map.notification_accepted = false
     @map.save
-    #puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
-    #calling the automated metareviewer controller, which calls its corresponding model/view
-    if(params[:save_options] == "WithMeta")
-      redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.id
-    elsif(params[:save_options] == "EmailMeta")
-      redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
-      # calculate the metareview metrics
-      @automated_metareview = AutomatedMetareview.new
-      #pass in the response id as a parameter
-      @response = Response.find_by_map_id(params[:id])
-      @automated_metareview.calculate_metareview_metrics(@response, params[:id])
-      #send email to the reviewer with the metareview details
-      @automated_metareview.send_metareview_metrics_email(@response, params[:id])
-    elsif(params[:save_options] == "WithoutMeta")
+    if(@map.assignment.id == 561) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
+      # puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
+      #calling the automated metareviewer controller, which calls its corresponding model/view
+      if(params[:save_options] == "WithMeta")
+        puts "WithMeta"
+        redirect_to :controller => 'automated_metareviews', :action => 'list', :id => @map.id
+      elsif(params[:save_options] == "EmailMeta")
+        redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+        # calculate the metareview metrics
+        @automated_metareview = AutomatedMetareview.new
+        #pass in the response id as a parameter
+        @response = Response.find_by_map_id(params[:id])
+        @automated_metareview.calculate_metareview_metrics(@response, params[:id])
+        #send email to the reviewer with the metareview details
+        @automated_metareview.send_metareview_metrics_email(@response, params[:id])
+      elsif(params[:save_options] == "WithoutMeta")
+        puts "WithoutMeta"
+        redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+      end
+    else
       redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
     end
     #end of call
