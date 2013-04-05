@@ -1,7 +1,7 @@
 class AuthController < ApplicationController
   helper :auth
-  before_filter :authorize, :except => :login
-  
+  before_filter :authorize, :except =>[:login, :url_redirect]
+
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :login, :logout ],
          :redirect_to => { :action => :list }
@@ -11,22 +11,27 @@ class AuthController < ApplicationController
       AuthController.clear_session(session)
     else
       user = User.find_by_login(params[:login][:name])
-      
+
       if user and user.valid_password?(params[:login][:password])
         logger.info "User #{params[:login][:name]} successfully logged in"
         session[:user] = user
         AuthController.set_current_role(user.role_id,session)
-        
-        respond_to do |wants|          
+
+        if session[:redirect_link]!=nil            # if user has logged in using a embedded url
+           url = session[:redirect_link]
+           session[:redirect_link]=nil              # remove url from session
+           redirect_to url                          # redirect to link
+        else                         # normal login
+        respond_to do |wants|
           wants.html do
             ## This line must be modified to read as shown at left when a new version of Goldberg is installed!
-            redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user]) 
+            redirect_to :controller => AuthHelper::get_home_controller(session[:user]), :action => AuthHelper::get_home_action(session[:user])
           end
           wants.xml do
             render :nothing => true, :status => 200
           end
         end
-        
+        end
       else
         logger.warn "Failed login attempt"
         respond_to do |wants|
@@ -41,11 +46,27 @@ class AuthController < ApplicationController
       end
     end
   end  # def login
- 
-  def login_failed
+
+
+  # link embedded in email redirects to this action for authorization.
+  def url_redirect
+
+  link = CGI::unescape(params[:redirect_link])
+  if !session[:user]                     #check if user is logged in
+          session[:redirect_link] = link #stores link in session variable.
+      redirect_to '/'                   #redirects to login page
+    else                          #user is logged in
+      redirect_to link
+    end
+  end
+
+
+
+ def login_failed
     flash.now[:error] = "Incorrect Name/Password"
     render :action => 'forgotten'
   end
+
 
   def logout
     AuthController.logout(session)
@@ -85,9 +106,11 @@ class AuthController < ApplicationController
       else
         check_controller = true
       end
-      
+
       # Check if there's a general permission for a controller
+     # puts'abcd'+params[:controller]
       if check_controller
+        #puts'abcd'+params[:controller]
         if session[:credentials].controllers.has_key?(params[:controller])
           if session[:credentials].controllers[params[:controller]]
             logger.info "Controller: authorised"
@@ -99,7 +122,7 @@ class AuthController < ApplicationController
           end
       end
     end  # Check permissions
-    
+
     logger.info "Authorised? #{authorised.to_s}"
     return authorised
   end
@@ -110,7 +133,7 @@ class AuthController < ApplicationController
   def self.logout(session)
     self.clear_session(session)
   end
-  
+
   def self.set_current_role(role_id, session)
     if role_id
        role = Role.find(role_id)

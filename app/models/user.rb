@@ -77,6 +77,22 @@ class User < ActiveRecord::Base
     clear_password
   end
 
+  # Generate email to user with new password
+  def reset_and_mail_password
+    self.reset_password!
+    Mailer.deliver_message(
+        {:recipients => self.email,
+         :subject => "Your Expertiza password has been reset",
+         :body => {
+           :user => self,
+           :password => clear_password,
+           :first_name => ApplicationHelper::get_user_first_name(self),
+           :partial_name => "send_password"
+         }
+        }
+    )
+  end
+
   def self.random_password(size=8)
     random_pronouncable_password((size/2).round) + rand.to_s[2,3]
   end

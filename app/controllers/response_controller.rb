@@ -213,6 +213,7 @@ class ResponseController < ApplicationController
     end
 
     begin
+       ResponseHelper.host = request.host_with_port
        ResponseHelper.compare_scores(@response, @questionnaire)
        ScoreCache.update_cache(@response.id)
     
@@ -354,6 +355,7 @@ class ResponseController < ApplicationController
     end
     
     begin
+      ResponseHelper.host = request.host_with_port
       ResponseHelper.compare_scores(@response, @questionnaire)
       ScoreCache.update_cache(@res)
       @map.save
@@ -446,6 +448,12 @@ class ResponseController < ApplicationController
   def redirect_when_disallowed(response)
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
     # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+    
+    # allow the instructor to view the feedback
+    if response.map.assignment.instructor.id == session[:user].id
+        return false
+    end
+
     if response.map.read_attribute(:type) == 'FeedbackResponseMap' && response.map.assignment.team_assignment
       team = response.map.reviewer.team
       unless team.has_user session[:user]

@@ -1,6 +1,6 @@
 class Assignment < ActiveRecord::Base
   include DynamicReviewMapping
-
+  include ActionController::UrlWriter
   belongs_to :course
   belongs_to :wiki_type
   # wiki_type needs to be removed. When an assignment is created, it needs to
@@ -402,6 +402,10 @@ class Assignment < ActiveRecord::Base
        # that includes the assignment, and which item has been updated.
        if mapping.reviewer.user.email_on_submission
           user = mapping.reviewer.user
+          # Generate link to response/edit/id to redirect the reviewers to his review
+          # of the submissions
+          redirect_url = url_for(:host=>host ,:controller => "response" , :action => "edit" , :id => mapping.response.id)
+          redirect_url = CGI::escape(redirect_url)
           Mailer.deliver_message(
             {:recipients => user.email,
              :subject => "A new submission is available for #{self.name}",
@@ -411,6 +415,7 @@ class Assignment < ActiveRecord::Base
               :location => get_review_number(mapping).to_s,
               :first_name => ApplicationHelper::get_user_first_name(user),
               :partial_name => "update"
+              :link => url_for(:host => host, :controller => "auth", :action => "url_redirect" , :redirect_link => redirect_url)
              }
             }
           )

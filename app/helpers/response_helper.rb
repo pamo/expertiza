@@ -1,5 +1,9 @@
 module ResponseHelper
 
+    class << self
+        attr_accessor :host
+    end
+
   # Compute the currently awarded scores for the reviewee
   # If the new teammate review's score is greater than or less than 
   # the existing scores by a given percentage (defined by
@@ -44,7 +48,7 @@ module ResponseHelper
      if new_score < (existing_score - allowed_difference) or new_score > (existing_score + allowed_difference)
        new_pct = new_score.to_f/max_possible_score
        avg_pct = existing_score.to_f/max_possible_score
-       curr_item.notify_on_difference(new_pct,avg_pct,aq.notification_limit)
+       curr_item.notify_on_difference(new_pct, avg_pct, aq.notification_limit, self.host)
      end
   end
 
