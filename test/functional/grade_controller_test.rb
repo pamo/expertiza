@@ -15,6 +15,7 @@ class GradesControllerTest < ActionController::TestCase
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
 
+
     @request.session[:user] = User.find(users(:admin).id ) 
     roleid = User.find(users(:admin).id).role_id 
     Role.rebuild_cache

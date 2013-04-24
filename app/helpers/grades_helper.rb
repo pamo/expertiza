@@ -1,15 +1,15 @@
 module GradesHelper
-    def label(object_name, method, label)
+  def label(object_name, method, label)
     content_tag(:label, h(label), :for => "#{object_name}_#{method}")
   end
 
-  def get_accordion_title(last_topic, new_topic)
+  def get_tabs_title(last_topic, new_topic, review_id)
     if last_topic.eql? nil
-      #this is the first accordion
-      render :partial => "response/accordion", :locals => {:title => new_topic, :is_first => true}
+      #this is the first tabs
+      render :partial => "response/tabs", :locals => {:title => new_topic, :is_first => true, :reviewid => review_id}
     elsif !new_topic.eql? last_topic
-      #render new accordion
-      render :partial => "response/accordion", :locals => {:title => new_topic, :is_first => false}
+      #render new tabs
+      render :partial => "response/tabs", :locals => {:title => new_topic, :is_first => false, :reviewid => review_id}
     end
   end
 
@@ -203,6 +203,6 @@ module GradesHelper
           end
           render :partial => "response/dropdown", :locals => {:ques_num => q_number, :ques_text => question.txt, :options => score_range, :table_title => table_hash["table_title"], :table_headers => table_hash["table_headers"], :start_col => table_hash["start_col"], :start_table => table_hash["start_table"], :end_col => table_hash["end_col"], :end_table => table_hash["end_table"], :view => view_output}
         end
-      end
+    end
   end
 end

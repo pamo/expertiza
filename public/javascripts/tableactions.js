@@ -20,20 +20,32 @@ function alternate(id){
   }
 }
 
-function toggleElement(elementId, linkText) {	
+function toggleElement(elementId, linkText) {
+
 	var obj = document.getElementById(elementId);
+
 	if (obj == null) { return; }	
-	var bExpand = obj.style.display.length == 0;	
-	obj.style.display = (bExpand ? 'none' : '');           
-	var objLinks = document.getElementsByName(elementId+'Link')
+	var bExpand = obj.style.display.length == 0;
+	obj.style.display = (bExpand ? 'none' : '');
+	var objLinks = document.getElementsByName(elementId+'Link');
+
 	for (var i = 0; i < objLinks.length; i++) {
-		if (Element.visible(obj)) {
+
+
+        var isNone =  obj.style.display == 'none';
+
+		if (!isNone) {
+
 			objLinks[i].innerHTML = 'hide ' + linkText
+
 		}
 		else {
+
 			objLinks[i].innerHTML = 'show ' + linkText
+
 		}
 	}
+
 }
         
 function toggleList(elementId,listSize) {

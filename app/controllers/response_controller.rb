@@ -212,7 +212,7 @@ class ResponseController < ApplicationController
     rescue
       msg = "An error occurred while saving the response: "+$!
     end
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end  
   
   def custom_update
@@ -236,7 +236,7 @@ class ResponseController < ApplicationController
     end
 
     msg = "#{@map.get_title} was successfully saved."
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end
 
   def new_feedback
@@ -353,7 +353,7 @@ class ResponseController < ApplicationController
       @response.delete
       error_msg = "Your response was not saved. Cause: " + $!
     end
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg, :save_options => params[:save_options]
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :error_msg => error_msg
   end      
   
   def custom_create
@@ -371,15 +371,17 @@ class ResponseController < ApplicationController
     end
     msg = "#{@map.get_title} was successfully saved."
     
-    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg, :save_options => params[:save_options]
+    redirect_to :controller => 'response', :action => 'saving', :id => @map.id, :return => params[:return], :msg => msg
   end
-  
+
   def saving   
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
-    @map.notification_accepted = false
+    @map.notification_accepted = false;
+    puts("saving for me ")
+    puts(params[:id]);
     @map.save
-    if(@map.assignment.id == 561 or @map.assignment.id == 559) #Making the automated metareview feature available for one 'ethical analysis 6' assignment only.
+    
       # puts("*** saving for me:: #{params[:id]} and metareview selection :save_options - #{params["save_options"]}")
       #calling the automated metareviewer controller, which calls its corresponding model/view
       if(params[:save_options] == "WithMeta")
@@ -399,10 +401,11 @@ class ResponseController < ApplicationController
         redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
       end
     else
-      redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
+    redirect_to :action => 'redirection', :id => @map.id, :return => params[:return], :msg => params[:msg], :error_msg => params[:error_msg]
     end
     #end of call
   end
+  
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note]  = params[:msg] unless params[:msg] and params[:msg].empty?

@@ -45,5 +45,15 @@ module ApplicationHelper
   def self.get_field(element,field,model,column)   
     item = Object.const_get(model).find(element[column.to_sym])
     return item[field.to_sym]
-  end 
+  end
+# method to get the tab title when using tabbed approach for display
+  def get_tabs_title(last_topic, new_topic)
+    if last_topic.eql? nil
+      #this is the first tabs
+      render :partial => "response/tabs", :locals => {:title => new_topic, :is_first => true}
+    elsif !new_topic.eql? last_topic
+      #render new tabs
+      render :partial => "response/tabs", :locals => {:title => new_topic, :is_first => false}
+    end
+  end
 end
